@@ -17,17 +17,32 @@
 # under the License.
 #
 
-name: "Build"
+name: "Build (branch-3.5, Scala 2.13, Hadoop 3, JDK 8)"
 
 on:
-  push:
-    branches:
-    - '**'
   pull_request:
 
 jobs:
-  call-build-and-test:
+  run-build:
     permissions:
       packages: write
     name: Run
     uses: ./.github/workflows/build_and_test.yml
+    if: github.repository == 'logicalclocks/spark'
+    with:
+      java: 8
+      branch: branch-3.5
+      hadoop: hadoop3
+      envs: >-
+        {
+          "SCALA_PROFILE": "scala2.13"
+        }
+      jobs: >-
+        {
+          "build": "true",
+          "pyspark": "true",
+          "sparkr": "true",
+          "tpcds-1g": "true",
+          "docker-integration-tests": "true",
+          "lint" : "true"
+        }
