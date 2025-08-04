@@ -43,7 +43,7 @@ RUN mkdir -p /usr/local/pypy/pypy3.8 && \
     ln -sf /usr/local/pypy/pypy3.8/bin/pypy /usr/local/bin/pypy3.8 && \
     ln -sf /usr/local/pypy/pypy3.8/bin/pypy /usr/local/bin/pypy3
 
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | pypy3
+RUN curl -sS https://bootstrap.pypa.io/pip/3.8/get-pip.py | pypy3
 
 RUN $APT_INSTALL gnupg ca-certificates pandoc
 RUN echo 'deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/' >> /etc/apt/sources.list
