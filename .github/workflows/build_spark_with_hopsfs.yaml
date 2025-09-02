@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: 'ghrunner-ee8'
+      build:
+        description: 'Whether to build spark or not, default is false. If this is false then the workflow will only prepare the versioning related outputs.'
+        required: false
+        type: boolean
+        default: true
     secrets:
       NEXUS_HARBOR_PASSWORD:
         required: true
@@ -38,6 +43,12 @@ on:
         required: false
         type: string
         default: 'ghrunner-ee8'
+      build:
+        description: 'Whether to build spark or not, default is false. If this is false then the workflow will only prepare the versioning related outputs.'
+        required: false
+        type: boolean
+        default: true
+  pull_request:
     
 concurrency:
   group: build-spark-${{ github.workflow }}-${{ github.job }}-${{ inputs.jira_tag || 'NOJIRA' }}
@@ -68,6 +79,26 @@ jobs:
           ref: ${{ env.SPARK_REF }}
           path: ${{ github.workspace }}/spark
 
+      - name: To build or not to build
+        id: to_build_or_not_to_build
+        shell: bash
+        env:
+          BUILD_SPARK: ${{ (github.event_name == 'pull_request' && contains(join(github.event.pull_request.labels.*.name, ','), 'build-spark')) || inputs.build }}
+        run: |
+          if [[ "${{ env.BUILD_SPARK }}" != "true" ]]; then
+            echo "# :recycle: Not building Spark" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+              echo "This is a pull request and the 'build-spark' label is not present." >> $GITHUB_STEP_SUMMARY
+              echo "pull_request_labels=${{ join(github.event.pull_request.labels.*.name, ', ') }}" >> $GITHUB_STEP_SUMMARY
+            elif [[ "${{ inputs.build || 'false'}}" != "true" ]]; then
+              echo "The input 'build' is set to false." >> $GITHUB_STEP_SUMMARY
+            fi
+            echo "BUILD_SPARK=$BUILD_SPARK" >> $GITHUB_OUTPUT
+          else
+            echo "# :white_check_mark: Building Spark" >> $GITHUB_STEP_SUMMARY
+            echo "BUILD_SPARK=$BUILD_SPARK" >> $GITHUB_OUTPUT
+          fi
+
       - name: Prep step version
         shell: bash
         id: prep_version
@@ -88,7 +119,6 @@ jobs:
           echo "SPARK_TAR_URL=${SPARK_TAR_URL}" >> $GITHUB_ENV
           echo "HOPSFS_VERSION=${HOPSFS_VERSION}" >> $GITHUB_ENV
 
-          echo "# Build Spark" >> $GITHUB_STEP_SUMMARY
           echo "POM_VERSION_NO_JIRA=${POM_VERSION_NO_JIRA}" >> $GITHUB_STEP_SUMMARY
           echo "POM_VERSION=${POM_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_STEP_SUMMARY
@@ -105,6 +135,7 @@ jobs:
 
       - name: Set up .m2 settings.xml
         shell: bash
+        if: steps.to_build_or_not_to_build.outputs.BUILD_SPARK == 'true'
         env:
           M2_HOME: ~/.m2
         run: |
@@ -113,6 +144,7 @@ jobs:
         
       - name: Cache maven
         id: cache-maven
+        if: steps.to_build_or_not_to_build.outputs.BUILD_SPARK == 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -125,6 +157,7 @@ jobs:
 
       - name: Build spark and spark-packaging
         shell: bash
+        if: steps.to_build_or_not_to_build.outputs.BUILD_SPARK == 'true'
         working-directory: ${{ github.workspace }}/spark
         env:
           POM_VERSION: ${{ env.POM_VERSION }}
@@ -134,6 +167,7 @@ jobs:
           
       - name: Upload spark-packaging artifact to Nexus
         shell: bash
+        if: steps.to_build_or_not_to_build.outputs.BUILD_SPARK == 'true'
         working-directory: ${{ github.workspace }}/spark
         env:
           M2_HOME: ~/.m2
