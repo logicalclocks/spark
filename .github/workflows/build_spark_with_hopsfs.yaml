@@ -26,6 +26,28 @@ on:
     secrets:
       NEXUS_HARBOR_PASSWORD:
         required: true
+    outputs:
+      pom_version_no_jira:
+        value: ${{ jobs.build-spark.outputs.pom_version_no_jira }}
+        description: 'The pom version without the jira tag'
+      pom_version:
+        value: ${{ jobs.build-spark.outputs.pom_version }}
+        description: 'The pom version with the jira tag'
+      commit_hash:
+        value: ${{ jobs.build-spark.outputs.commit_hash }}
+        description: 'The commit hash of the spark repo'
+      jira_tag:
+        value: ${{ jobs.build-spark.outputs.jira_tag }}
+        description: 'The jira tag used for the build'
+      spark_tar_name:
+        value: ${{ jobs.build-spark.outputs.spark_tar_name }}
+        description: 'The name of the spark tar file'
+      spark_tar_url:
+        value: ${{ jobs.build-spark.outputs.spark_tar_url }}
+        description: 'The url of the spark tar file'
+      hopsfs_version:
+        value: ${{ jobs.build-spark.outputs.hopsfs_version }}
+        description: 'The version of hopsfs used in the build'
   workflow_dispatch:
     inputs:
       ref:
