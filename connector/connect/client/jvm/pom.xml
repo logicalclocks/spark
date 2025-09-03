@@ -122,7 +122,7 @@
               <include>com.google.errorprone:*</include>
               <include>com.google.j2objc:*</include>
               <include>com.google.protobuf:*</include>
-              <include>com.google.flatbuffers:*</include>
+              <!-- <include>com.google.flatbuffers:*</include> -->
               <include>io.grpc:*</include>
               <include>io.netty:*</include>
               <include>io.perfmark:*</include>
