@@ -140,7 +140,7 @@ jobs:
           M2_HOME: ~/.m2
         run: |
           echo "M2_HOME var is $M2_HOME" >> $GITHUB_STEP_SUMMARY
-          mkdir -p ~/.m2 && echo "<settings><servers><server><id>HopsEE</id><username>${{ inputs.nexus_user }}</username><password>${{ secrets.NEXUS_HARBOR_PASSWORD }}</password><configuration></configuration></server></servers></settings>" > ~/.m2/settings.xml
+          mkdir -p ~/.m2 && echo "<settings><servers><server><id>HopsEE</id><username>${{ vars.NEXUS_HARBOR_USER }}</username><password>${{ secrets.NEXUS_HARBOR_PASSWORD }}</password><configuration></configuration></server></servers></settings>" > ~/.m2/settings.xml
         
       - name: Cache maven
         id: cache-maven
@@ -172,6 +172,6 @@ jobs:
         env:
           M2_HOME: ~/.m2
         run: |
-          curl -u ${{ vars.NEXUS_DEV_SPARK_URL }}:${{ secrets.NEXUS_HARBOR_PASSWORD }} --upload-file spark-$POM_VERSION-bin-without-hadoop-with-hive.tgz "${SPARK_TAR_URL}"
+          curl -u ${{ vars.NEXUS_HARBOR_USER }}:${{ secrets.NEXUS_HARBOR_PASSWORD }} --upload-file spark-$POM_VERSION-bin-without-hadoop-with-hive.tgz "${SPARK_TAR_URL}"
           export MAVEN_OPTS="${MAVEN_OPTS:--Xss128m -Xmx4g -XX:ReservedCodeCacheSize=128m}"
           ./build/mvn deploy -DskipTests -Dmaven.javadoc.skip=true -Dmaven.scaladoc.skip=true -Dmaven.source.skip -Dcyclonedx.skip=true -Pkubernetes,hadoop-provided,parquet-provided,hive,hadoop-cloud
