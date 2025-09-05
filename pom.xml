@@ -2499,7 +2499,7 @@
             <artifactId>jasper-runtime</artifactId>
           </exclusion>
           <exclusion>
-            <groupId>com.vlkan</groupId>
+            <groupId>com.google</groupId>
             <artifactId>flatbuffers</artifactId>
           </exclusion>
           <!-- End of Hive 2.3 exclusion -->
