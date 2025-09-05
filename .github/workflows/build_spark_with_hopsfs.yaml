@@ -162,8 +162,13 @@ jobs:
           M2_HOME: ~/.m2
         run: |
           echo "M2_HOME var is $M2_HOME" >> $GITHUB_STEP_SUMMARY
-          mkdir -p ~/.m2 && echo "<settings><servers><server><id>HopsEE</id><username>${{ vars.NEXUS_HARBOR_USER }}</username><password>${{ secrets.NEXUS_HARBOR_PASSWORD }}</password><configuration></configuration></server></servers></settings>" > ~/.m2/settings.xml
-        
+          mkdir -p ~/.m2
+          echo "<settings>" > ~/.m2/settings.xml
+          echo "<servers><server><id>HopsEE</id><username>${{ vars.NEXUS_HARBOR_USER }}</username><password>${{ secrets.NEXUS_HARBOR_PASSWORD }}</password><configuration></configuration></server></servers>" >> ~/.m2/settings.xml
+          echo "<servers><server><id>HiveEE</id><username>${{ vars.NEXUS_HARBOR_USER }}</username><password>${{ secrets.NEXUS_HARBOR_PASSWORD }}</password><configuration></configuration></server></servers>" >> ~/.m2/settings.xml
+          echo "</settings>" >> ~/.m2/settings.xml
+
+
       - name: Cache maven
         id: cache-maven
         if: steps.to_build_or_not_to_build.outputs.BUILD_SPARK == 'true'
