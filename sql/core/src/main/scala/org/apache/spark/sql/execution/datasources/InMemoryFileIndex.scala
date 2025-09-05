@@ -32,6 +32,7 @@ import org.apache.spark.sql.execution.streaming.FileStreamSink
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.util.HadoopFSUtils
 
+implicit val pathOrdering: Ordering[Path] = Ordering.by(_.toString)
 
 /**
  * A [[FileIndex]] that generates the list of files to process by recursively listing all the
