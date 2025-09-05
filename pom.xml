@@ -374,15 +374,15 @@
       </snapshots>
     </repository>
     <repository>
-        <id>HiveEE</id>
-        <name>HiveEE Repo</name>
-        <url>https://nexus.hops.works/repository/hive-artifacts</url>
-        <releases>
-            <enabled>true</enabled>
-        </releases>
-        <snapshots>
-            <enabled>true</enabled>
-        </snapshots>
+      <id>HiveEE</id>
+      <name>HiveEE Repo</name>
+      <url>https://nexus.hops.works/repository/hive-artifacts</url>
+      <releases>
+          <enabled>true</enabled>
+      </releases>
+      <snapshots>
+          <enabled>true</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <pluginRepositories>
