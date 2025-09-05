@@ -100,8 +100,7 @@ class InMemoryFileIndex(
   }
 
   override def equals(other: Any): Boolean = other match {
-    case hdfs: InMemoryFileIndex if rootPaths.size == hdfs.rootPaths.size =>
-      rootPaths.sorted == hdfs.rootPaths.sorted
+    case hdfs: InMemoryFileIndex => rootPaths.toSet == hdfs.rootPaths.toSet
     case _ => false
   }
 
@@ -143,8 +142,6 @@ class InMemoryFileIndex(
 }
 
 object InMemoryFileIndex extends Logging {
-  implicit val pathOrdering: Ordering[Path] = Ordering.by(_.toString)
-
   private[sql] def bulkListLeafFiles(
       paths: Seq[Path],
       hadoopConf: Configuration,
