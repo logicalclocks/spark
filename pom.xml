@@ -4039,6 +4039,9 @@
       <id>HopsEE</id>
       <name>Hops Release Repository</name>
       <url>https://nexus.hops.works/repository/hops-artifacts</url>
+      <snapshot>
+        <enabled>true</enabled>
+      </snapshot>
     </repository>
   </distributionManagement>
 </project>
