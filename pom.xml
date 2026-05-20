@@ -122,7 +122,7 @@
     <slf4j.version>2.0.17</slf4j.version>
     <log4j.version>2.24.3</log4j.version>
     <!-- make sure to update IsolatedClientLoader whenever this version is changed -->
-    <hadoop.version>3.4.3.0-EE-RC3</hadoop.version>
+    <hadoop.version>3.4.3.0-EE-RC4</hadoop.version>
     <hadoop.group>io.hops</hadoop.group>
     <!-- SPARK-41247: When updating `protobuf.version`, also need to update `protoVersion` in `SparkBuild.scala` -->
     <protobuf.version>3.23.4</protobuf.version>
@@ -462,6 +462,21 @@
       <groupId>com.github.sbt</groupId>
       <artifactId>junit-interface</artifactId>
       <scope>test</scope>
+    </dependency>
+    <!-- Hadoop 3.4.x pulls in reload4j, which collides with the log4j-1.2-api
+         bridge and triggers a JVM VerifyError. Mark provided so neither jar
+         is bundled into Spark's assembly. -->
+    <dependency>
+      <groupId>ch.qos.reload4j</groupId>
+      <artifactId>reload4j</artifactId>
+      <version>1.2.22</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-reload4j</artifactId>
+      <version>1.7.36</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <dependencyManagement>
@@ -1472,6 +1487,15 @@
           <exclusion>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+          <!-- Block reload4j transitively; see reload4j note above. -->
+          <exclusion>
+            <groupId>ch.qos.reload4j</groupId>
+            <artifactId>reload4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-reload4j</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
