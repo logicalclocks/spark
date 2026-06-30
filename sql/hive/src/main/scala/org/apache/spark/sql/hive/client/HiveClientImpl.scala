@@ -17,7 +17,6 @@
 
 package org.apache.spark.sql.hive.client
 
-import java.io.PrintStream
 import java.lang.{Iterable => JIterable}
 import java.lang.reflect.InvocationTargetException
 import java.nio.charset.StandardCharsets.UTF_8
@@ -31,6 +30,7 @@ import scala.collection.mutable.ArrayBuffer
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.hive.common.StatsSetupConst
+import org.apache.hadoop.hive.common.io.SessionStream
 import org.apache.hadoop.hive.conf.HiveConf
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars
 import org.apache.hadoop.hive.metastore.{IMetaStoreClient, TableType => HiveTableType}
@@ -177,8 +177,8 @@ private[hive] class HiveClientImpl(
     // got changed. We reset it to clientLoader.ClassLoader here.
     state.getConf.setClassLoader(clientLoader.classLoader)
     shim.setCurrentSessionState(state)
-    state.out = new PrintStream(outputBuffer, true, UTF_8.name())
-    state.err = new PrintStream(outputBuffer, true, UTF_8.name())
+    state.out = new SessionStream(outputBuffer, true, UTF_8.name())
+    state.err = new SessionStream(outputBuffer, true, UTF_8.name())
     state
   }
 
@@ -306,15 +306,15 @@ private[hive] class HiveClientImpl(
     ret
   }
 
-  def setOut(stream: PrintStream): Unit = withHiveState {
+  def setOut(stream: SessionStream): Unit = withHiveState {
     state.out = stream
   }
 
-  def setInfo(stream: PrintStream): Unit = withHiveState {
+  def setInfo(stream: SessionStream): Unit = withHiveState {
     state.info = stream
   }
 
-  def setError(stream: PrintStream): Unit = withHiveState {
+  def setError(stream: SessionStream): Unit = withHiveState {
     state.err = stream
   }
 
@@ -834,9 +834,10 @@ private[hive] class HiveClientImpl(
       // Since HIVE-18238(Hive 3.0.0), the Driver.close function's return type changed
       // and the CommandProcessorFactory.clean function removed.
       driver.getClass.getMethod("close").invoke(driver)
-      if (version != hive.v3_0 && version != hive.v3_1) {
-        CommandProcessorFactory.clean(conf)
-      }
+      // Hive 3.x (HIVE-18238) removed CommandProcessorFactory.clean; nothing to do here.
+      // if (version != hive.v3_0 && version != hive.v3_1) {
+      //   CommandProcessorFactory.clean(conf)
+      // }
     }
 
     // Hive query needs to start SessionState.
@@ -996,18 +997,15 @@ private[hive] class HiveClientImpl(
     others.foreach { table =>
       val t = table.getTableName
       logDebug(s"Deleting table $t")
-      try {
-        shim.getIndexes(client, "default", t, 255).foreach { index =>
-          shim.dropIndex(client, "default", t, index.getIndexName)
-        }
-        if (!table.isIndexTable) {
-          shim.dropTable(client, "default", t)
-        }
-      } catch {
-        case _: NoSuchMethodError =>
-          // HIVE-18448 Hive 3.0 remove index APIs
-          shim.dropTable(client, "default", t)
-      }
+      // HIVE-18448: Hive 3.x removed index support, so there are no indexes to drop
+      // and Table.isIndexTable no longer exists. Just drop the table directly.
+      // shim.getIndexes(client, "default", t, 255).foreach { index =>
+      //   shim.dropIndex(client, "default", t, index.getIndexName)
+      // }
+      // if (!table.isIndexTable) {
+      //   shim.dropTable(client, "default", t)
+      // }
+      shim.dropTable(client, "default", t)
     }
     shim.getAllDatabases(client).filterNot(_ == "default").foreach { db =>
       logDebug(s"Dropping Database: $db")
