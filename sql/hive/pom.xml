@@ -132,6 +132,16 @@
       <artifactId>hive-exec</artifactId>
       <classifier>${hive.classifier}</classifier>
     </dependency>
+    <!-- Supplies org.apache.hadoop.hive.ql.parse.*, which hive-exec's `core` classifier
+         stopped carrying when Hive 4 split the parser into its own module. See the managed
+         dependency in the root pom for why FunctionRegistry needs it. Once
+         dev/check-hive-function-registry.sh is green in CI, the unpack-hive-exec-ql-shims
+         execution below becomes redundant (hive-parser supplies ASTNode/ASTNodeOrigin,
+         hive-storage-api the hive/common classes) and should be removed separately. -->
+    <dependency>
+      <groupId>${hive.group}</groupId>
+      <artifactId>hive-parser</artifactId>
+    </dependency>
     <dependency>
       <groupId>${hive.group}</groupId>
       <artifactId>hive-udf</artifactId>
