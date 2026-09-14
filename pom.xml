@@ -875,11 +875,15 @@
       </dependency>
 
       <!-- log4j -->
+      <!--
+        Always ship slf4j-api, even with -Phadoop-provided (same reasoning as SPARK-43534 for
+        log4j-1.2-api / log4j-slf4j2-impl). Hadoop 3.4.x only provides slf4j-api 1.7.x, while
+        log4j-slf4j2-impl needs the 2.x API (org.slf4j.spi.LoggingEventBuilder).
+      -->
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
         <version>${slf4j.version}</version>
-        <scope>${hadoop.deps.scope}</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -2252,6 +2256,11 @@
           <exclusion>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
+          </exclusion>
+          <!-- SLF4J 1.x binding pulled in via hive-common; Spark ships log4j-slf4j2-impl (SLF4J 2.x). -->
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
           </exclusion>
         </exclusions>
       </dependency>
