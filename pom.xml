@@ -26,7 +26,7 @@
   </parent>
   <groupId>org.apache.spark</groupId>
   <artifactId>spark-parent_2.13</artifactId>
-  <version>4.1.3.1-SNAPSHOT</version>
+  <version>4.1.3.1.0</version>
   <packaging>pom</packaging>
   <name>Spark Project Parent POM</name>
   <url>https://spark.apache.org/</url>
@@ -127,7 +127,7 @@
     <slf4j.version>2.0.17</slf4j.version>
     <log4j.version>2.24.3</log4j.version>
     <!-- make sure to update IsolatedClientLoader whenever this version is changed -->
-    <hadoop.version>3.4.3.3-EE-RC0</hadoop.version>
+    <hadoop.version>3.4.3.4-EE-RC0</hadoop.version>
     <hadoop.group>io.hops</hadoop.group>
     <!-- SPARK-41247: When updating `protobuf.version`, also need to update `protoVersion` in `SparkBuild.scala` -->
     <protobuf.version>4.33.0</protobuf.version>
@@ -137,7 +137,7 @@
     <hive.group>io.hops.hive</hive.group>
     <hive.classifier>core</hive.classifier>
     <!-- Version used in Maven Hive dependency -->
-    <hive.version>4.1.0</hive.version>
+    <hive.version>4.1.0.2.0</hive.version>
     <!-- note that this should be compatible with Kafka brokers version 0.10 and up -->
     <kafka.version>3.9.1</kafka.version>
     <!-- After 10.17.1.0, the minimum required version is JDK19 -->
@@ -299,7 +299,7 @@
     <!-- Must match ${hive.version}: hive-exec/hive-serde 4.1.0 are compiled against
          storage-api 4.1.0, and ORC 2.x needs DateColumnVector which older storage-api
          versions (e.g. the Hops Hive 3.0-era 2.6.1.x) do not have. -->
-    <hive.storage.version>4.1.0</hive.storage.version>
+    <hive.storage.version>4.1.0.2.0</hive.storage.version>
     <hive.storage.scope>compile</hive.storage.scope>
     <hive.common.scope>compile</hive.common.scope>
     <!-- Upstream moved this to `test` in Spark 4.0. We keep it on the runtime classpath:
